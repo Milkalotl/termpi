@@ -34,8 +34,7 @@ int main(){
   event_class fox; 
   
   start.add_textbox(
-      "Welcome to TEST! Here, Dreams come true!! blragrgggg....", {""}
-      );
+      "Welcome to TEST! Here, Dreams come true!! blragrgggg....");
     for(int e = 1; e < v_script.size(); e++)
     fox.add_textbox(v_script.at(e), v_profile);
   

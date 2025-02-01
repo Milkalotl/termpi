@@ -35,6 +35,7 @@ void v_s_clean_func(std::vector<std::string> * vectorptr){
 
 class textbox{
   private:
+    bool has_portrait;
     bool pref_pause;
     bool pref_clear;
     int pref_row;
@@ -50,6 +51,18 @@ class textbox{
       fulltext = s_split_func(h_text,' ');
       linenum = fulltext.size();
       portrait = h_portrait;
+      has_portrait = true;
+      pref_pause = false;
+      pref_clear = true;
+      pref_row = 0;
+      pref_col = MAX_COL;
+      spaces = ' ';
+    }
+    
+    textbox(std::string h_text){ 
+      fulltext = s_split_func(h_text,' ');
+      linenum = fulltext.size();
+      has_portrait = false;
       pref_pause = false;
       pref_clear = true;
       pref_row = 0;
@@ -58,20 +71,25 @@ class textbox{
     }
     
     textbox(std::string h_text, std::vector<std::string> h_portrait, bool pp, bool pc, int prow, int pcol, char spc){ 
-      fulltext = s_split_func(h_text,' ');d
+      fulltext = s_split_func(h_text,' ');
       linenum = fulltext.size();
       portrait = h_portrait;
+      has_portrait = true;
       pref_pause = pp;
       pref_clear = pc;
       pref_row = prow;
       pref_col = pcol;
-      spaces = del;
+      spaces = spc;
     }
-    
+   
+    void add_portait(std::vector<std::string> h_portrait){
+      portrait = h_portrait;
+      has_portrait = true;
+    }
     void play(){
-      printportrait();
+      if(has_portrait) printportrait();
       printtext(' ', false);
-      clear(true);
+      if(pref_clear) clear(true);
     }
 
     void printportrait(){
@@ -162,6 +180,13 @@ class event_class{
 
     void add_textbox(std::string h_text, std::vector<std::string> h_portrait){
       textbox h_textbox(h_text, h_portrait);
+      textboxes.push_back(h_textbox);
+      event_length += 1;
+      return;
+    }
+    
+    void add_textbox(std::string h_text){
+      textbox h_textbox(h_text);
       textboxes.push_back(h_textbox);
       event_length += 1;
       return;
