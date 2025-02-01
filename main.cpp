@@ -80,7 +80,7 @@ class textbox{
       std::cout << "*";
       for(int e = 0; e < MAX_COL; e++) std::cout << "-";
       std::cout << "*" << std::endl;
-      for(int e = 1; e < portrait.size(); e++)
+      for(int e = 0; e < portrait.size(); e++)
         std::cout << "| " << portrait.at(e) << std::endl;
       std::cout << "*";
       for(int e = 0; e < MAX_COL; e++) std::cout << "-";

@@ -12,21 +12,21 @@ int main(){
   sigIntHandler.sa_flags = 0;
   sigaction(SIGINT, &sigIntHandler, NULL);
 
-  vector<string> v_script;
-  vector<string> v_profile;
+  vector<string> fox_script;
+  vector<string> fox_profile;
   std::ifstream f_script("script.txt");
-  std::ifstream f_profile("portrait.txt");
+  std::ifstream f_profile("fox.portrait");
   std::ostringstream buffer;
   string s_buffer;
   
   buffer << f_script.rdbuf();
   s_buffer = buffer.str();
-  v_script = s_split_func(s_buffer, '#'); 
+  fox_script = s_split_func(s_buffer, '#'); 
  
   while(std::getline( f_profile, s_buffer))
-    v_profile.push_back(s_buffer);
+    fox_profile.push_back(s_buffer);
   
-  v_s_clean_func(&v_script);  
+  v_s_clean_func(&fox_script);  
 
 //-------------------------------------------------
 
@@ -35,8 +35,8 @@ int main(){
   
   start.add_textbox(
       "Welcome to TEST! Here, Dreams come true!! blragrgggg....");
-    for(int e = 1; e < v_script.size(); e++)
-    fox.add_textbox(v_script.at(e), v_profile);
+    for(int e = 1; e < fox_script.size(); e++)
+    fox.add_textbox(fox_script.at(e), fox_profile);
   
   start.play_all();
 
