@@ -1,4 +1,5 @@
 #include "main.cpp"
+#include <signal.h>
 
 using namespace std;
 
