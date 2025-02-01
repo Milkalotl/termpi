@@ -1,9 +1,11 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <termios.h>
 #include <unistd.h>
+#include <fstream>
 
 using std::string;
 using std::vector;
@@ -11,41 +13,69 @@ using std::vector;
 using std::cout;
 using std::cin;
 using std::endl;
+using std::ofstream;
+
 
 
 #define MAX_ROW 60
 #define MAX_COL 5
 #define LINE_DELAY 25000
 
+vector<string> s_split_func(string h_text, char del){
+      vector<string> t_vector;
+      string token;
+      size_t pos = 0;
+      while ((pos = h_text.find(del)) != string::npos) {
+        token = h_text.substr(0, pos);
+        t_vector.push_back(token);
+        h_text.erase(0, pos + 1);
+    }
+    t_vector.push_back(h_text);
+
+    return t_vector;
+}
+
+void v_s_clean_func(vector<string> * vectorptr){
+  for(int e = 0; e < vectorptr->size(); e++){
+    vectorptr->at(e).erase(remove_if(vectorptr->at(e).begin(), vectorptr->at(e).end(), ::iscntrl), vectorptr->at(e).end());
+  }
+  return;
+}
+
 class textbox{
   public:
     vector <string> fulltext;
+    vector<string> portrait;
     int linenum;
     int boxnum;
 
-    textbox(string h_text){ 
-      size_t pos = 0;
-      string token;
-      linenum = 1;
-      while ((pos = h_text.find(" ")) != string::npos) {
-        token = h_text.substr(0, pos);
-        fulltext.push_back(token);
-        h_text.erase(0, pos + 1);
-       // string temporary; 
-       // for (const auto &piece : fulltext) temporary += " | " + piece;
-       // cout <<"T: " << token << endl <<"H:" << h_text << endl << "F: " << temporary << endl;
-        linenum += 1;
-    }
-    fulltext.push_back(h_text);
-
+    textbox(string h_text, vector<string> h_portrait){ 
+      fulltext = s_split_func(h_text,' ');
+      linenum = fulltext.size();
+      portrait = h_portrait;
     }
     
-    void printportrait(){
-      //do this haha
-      return;
+    void play(){
+      printportrait();
+      printtext(' ', false);
+      clear(true);
     }
 
+    void printportrait(){
+      string t_string;
+      std::stringstream buffer;
+      cout << "*";
+      for(int e = 0; e < MAX_ROW; e++) cout << "-";
+      cout << "*" << endl;
+      for(int e = 1; e < portrait.size(); e++)
+        cout << "| " << portrait.at(e) << endl;
+      cout << "*";
+      for(int e = 0; e < MAX_ROW; e++) cout << "-";
+      cout << "*" << endl;
 
+
+      return;
+    }
 
     void printtext(char del, bool ask){
       
@@ -90,6 +120,38 @@ class textbox{
  // private:
 };
 
+class event_class{
+  public:
+    vector<textbox> textboxes;
+    int event_length;
+      
+      event_class(void){
+        event_length = 0;
+      }
+
+    void add_textbox(string h_text, vector<string> h_portrait){
+      textbox h_textbox(h_text, h_portrait);
+      textboxes.push_back(h_textbox);
+      event_length += 1;
+      return;
+    }
+    void play_textbox(int index){
+      textboxes.at(index).play();
+      return;
+    }
+    void play_between(int index_a, int index_b){
+      for (int e = index_a; e <= index_b; e++)
+        play_textbox(e);
+      return;
+    }
+
+    void play_all(){
+      for(int e = 0; e < event_length; e++)
+        play_textbox(e); 
+      return;
+    }
+};
+
 void LINUX_SETUP(char on_or_off){
   if(on_or_off == 'n') system("stty -echo");
   else system("stty echo");
@@ -103,8 +165,10 @@ void linux_handler(int s){
   exit(1);
 }
 
+
+/*
 //temporary as this is a library
-int main(int argc, char ** argv){
+int old_main(int argc, char ** argv){
   
 //linux only stuff
   LINUX_SETUP('n');
@@ -117,27 +181,35 @@ int main(int argc, char ** argv){
   sigaction(SIGINT, &sigIntHandler, NULL);
 // end of linux only;
 
-/*
   if(argc == 1){ cout << "please put a text dummy" << endl; return -1;} 
   string holdstring(argv[1]);
   for(int e = 2; e < argc; e++){ 
     string temp_string(argv[e]);
     holdstring += " " + temp_string;
-  }*/
-  string holdstring_1(
-      "The quick brown fox jumped over the lazy dog, but jumped so high he reached the heavens. There, there was a chariot being driven around and around by three golden deer. As the deer approached the fox, they asked him questions. \"why are you here, isnt this a miserable place?\". \"why come to a place such as this, where your shoulders ache and your legs quake\". The fox looked puzzled, as his shoulders and legs were as they were when he was on the floor.");
-  string holdstring_2(
-      "So he said as such. \"I quite don't know what aches and quakes you speak of, quick deer. My body is as firm and fit as it was when I was below the clouds\". But the deer, still going round and round, sneered at this assertion. \"But it has always been this way, fox. Here, shoulders ache and legs ache, and such is the way of life. so either you are above everyone else, or you arent alive\" Fox pondered this for a moment.");
-  string holdstring_3(
-      "He looked at his paws, and saw his fur not rotten. He scratched his ears, and saw they still heard. He sat down, and saw his legs still sat. \"I am rather certain I am not dead, deer. So, therefore, I must be above you all\". and so he was.");
-  textbox n_textbox_1(holdstring_1);
-  textbox n_textbox_2(holdstring_2);
-  textbox n_textbox_3(holdstring_3);
-  n_textbox_1.printtext(' ', false); n_textbox_1.clear(true);
-  n_textbox_2.printtext(' ', false); n_textbox_2.clear(true);
-  n_textbox_3.printtext(' ', false); n_textbox_3.clear(true);
+  } 
+  vector<string> v_script;
+  vector<string> v_portrait;
+  std::ifstream f_script("script.txt");
+  std::ifstream f_portrait("images/marjane.txt");
+  std::ostringstream buffer;
+  string s_buffer;
+  
+  buffer << f_script.rdbuf();
+  s_buffer = buffer.str();
+  v_script = s_split_func(s_buffer, '#'); 
+ 
+  while(std::getline( f_portrait, s_buffer))
+    v_portrait.push_back(s_buffer);
+  
+  v_s_clean_func(&v_script);  
+
+  for(int e = 1; e < v_script.size(); e++){
+    textbox c_textbox(v_script.at(e), v_portrait);
+    c_textbox.printportrait(0);
+    c_textbox.printtext(' ', false); c_textbox.clear(true);
+  }
 
   LINUX_SETUP('f');
   return 0;
 
-}
+}*/
