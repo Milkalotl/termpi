@@ -7,25 +7,15 @@
 #include <unistd.h>
 #include <fstream>
 
-using std::string;
-using std::vector;
-
-using std::cout;
-using std::cin;
-using std::endl;
-using std::ofstream;
-
-
-
-#define MAX_ROW 60
-#define MAX_COL 5
+#define MAX_COL 60
+#define MAX_ROW 5
 #define LINE_DELAY 25000
 
-vector<string> s_split_func(string h_text, char del){
-      vector<string> t_vector;
-      string token;
+std::vector<std::string> s_split_func(std::string h_text, char del){
+      std::vector<std::string> t_vector;
+      std::string token;
       size_t pos = 0;
-      while ((pos = h_text.find(del)) != string::npos) {
+      while ((pos = h_text.find(del)) != std::string::npos) {
         token = h_text.substr(0, pos);
         t_vector.push_back(token);
         h_text.erase(0, pos + 1);
@@ -35,7 +25,7 @@ vector<string> s_split_func(string h_text, char del){
     return t_vector;
 }
 
-void v_s_clean_func(vector<string> * vectorptr){
+void v_s_clean_func(std::vector<std::string> * vectorptr){
   for(int e = 0; e < vectorptr->size(); e++){
     vectorptr->at(e).erase(remove_if(vectorptr->at(e).begin(), vectorptr->at(e).end(), ::iscntrl), vectorptr->at(e).end());
   }
@@ -43,16 +33,38 @@ void v_s_clean_func(vector<string> * vectorptr){
 }
 
 class textbox{
+  private:
+    bool pref_pause;
+    bool pref_clear;
+    int pref_row;
+    int pref_col;
+    char spaces;
   public:
-    vector <string> fulltext;
-    vector<string> portrait;
+    std::vector <std::string> fulltext;
+    std::vector<std::string> portrait;
     int linenum;
     int boxnum;
 
-    textbox(string h_text, vector<string> h_portrait){ 
+    textbox(std::string h_text, std::vector<std::string> h_portrait){ 
       fulltext = s_split_func(h_text,' ');
       linenum = fulltext.size();
       portrait = h_portrait;
+      pref_pause = false;
+      pref_clear = true;
+      pref_row = 0;
+      pref_col = MAX_COL;
+      spaces = ' ';
+    }
+    
+    textbox(std::string h_text, std::vector<std::string> h_portrait, bool pp, bool pc, int prow, int pcol, char spc){ 
+      fulltext = s_split_func(h_text,' ');d
+      linenum = fulltext.size();
+      portrait = h_portrait;
+      pref_pause = pp;
+      pref_clear = pc;
+      pref_row = prow;
+      pref_col = pcol;
+      spaces = del;
     }
     
     void play(){
@@ -62,16 +74,16 @@ class textbox{
     }
 
     void printportrait(){
-      string t_string;
+      std::string t_string;
       std::stringstream buffer;
-      cout << "*";
-      for(int e = 0; e < MAX_ROW; e++) cout << "-";
-      cout << "*" << endl;
+      std::cout << "*";
+      for(int e = 0; e < MAX_COL; e++) std::cout << "-";
+      std::cout << "*" << std::endl;
       for(int e = 1; e < portrait.size(); e++)
-        cout << "| " << portrait.at(e) << endl;
-      cout << "*";
-      for(int e = 0; e < MAX_ROW; e++) cout << "-";
-      cout << "*" << endl;
+        std::cout << "| " << portrait.at(e) << std::endl;
+      std::cout << "*";
+      for(int e = 0; e < MAX_COL; e++) std::cout << "-";
+      std::cout << "*" << std::endl;
 
 
       return;
@@ -79,15 +91,15 @@ class textbox{
 
     void printtext(char del, bool ask){
       
-      cout << "*";
-      for (int e = 0; e < (MAX_ROW + 2); e++)
-        cout << "-";
-      cout << "*";
+      std::cout << "*";
+      for (int e = 0; e < (MAX_COL + 2); e++)
+        std::cout << "-";
+      std::cout << "*";
       
-      cout << endl;
+      std::cout << std::endl;
       int curcount = 0;
       int w_length;
-      cout << "| ";
+      std::cout << "| ";
       int oldcur; 
       
       for(int e = 0; e < linenum; e++){
@@ -95,41 +107,59 @@ class textbox{
         w_length = fulltext.at(e).length() + 1;  
         oldcur = curcount; 
         curcount += w_length;
-        if(curcount >= MAX_ROW){ 
-          for (int f = 0; f < (MAX_ROW - oldcur); f++) cout << del;
-          cout << " |"; 
-          if(ask == true) cin.get();
-          cout << endl << "| "; 
+        if(curcount >= MAX_COL){ 
+          for (int f = 0; f < (MAX_COL - oldcur); f++) std::cout << del;
+          std::cout << " |"; 
+          if(ask == true) std::cin.get();
+          std::cout << std::endl << "| "; 
           curcount = w_length;   
         }
         
         usleep(LINE_DELAY);
-        cout << fulltext.at(e) << " ";
+        std::cout << fulltext.at(e) << " ";
       }
-      for (int f = 0; f < (MAX_ROW - curcount); f++) cout << del;
-      cout <<" |" << endl;
-      cout << "*";
-      for (int e = 0; e < (MAX_ROW + 2); e++)
-        cout << "-";
-      cout << "*" << endl;
+      for (int f = 0; f < (MAX_COL - curcount); f++) std::cout << del;
+      std::cout <<" |" << std::endl;
+      std::cout << "*";
+      for (int e = 0; e < (MAX_COL + 2); e++)
+        std::cout << "-";
+      std::cout << "*" << std::endl;
     }
     void clear(bool wait){
-      if(wait == true) cin.get();
+      if(wait == true) std::cin.get();
       system("clear -x");
     }
  // private:
 };
 
 class event_class{
-  public:
-    vector<textbox> textboxes;
+  private:
+    bool pref_pause;
+    bool pref_clear;
+    int pref_row;
+    int pref_col;
     int event_length;
+
+  public:
+    std::vector<textbox> textboxes;
       
       event_class(void){
         event_length = 0;
+        pref_pause = false;
+        pref_clear = true;
+        pref_row = 0;
+        pref_col = MAX_COL;
+      }
+      
+      event_class(bool pp, bool pc, int prow, int pcol){
+        event_length = 0;
+        pref_pause = pp;
+        pref_clear = pc;
+        pref_row = prow;
+        pref_col = pcol;
       }
 
-    void add_textbox(string h_text, vector<string> h_portrait){
+    void add_textbox(std::string h_text, std::vector<std::string> h_portrait){
       textbox h_textbox(h_text, h_portrait);
       textboxes.push_back(h_textbox);
       event_length += 1;
@@ -160,7 +190,7 @@ void LINUX_SETUP(char on_or_off){
 }
 
 void linux_handler(int s){
-  cout << endl;
+  std::cout << std::endl;
   system("stty echo");
   exit(1);
 }
@@ -181,18 +211,18 @@ int old_main(int argc, char ** argv){
   sigaction(SIGINT, &sigIntHandler, NULL);
 // end of linux only;
 
-  if(argc == 1){ cout << "please put a text dummy" << endl; return -1;} 
-  string holdstring(argv[1]);
+  if(argc == 1){ std::cout << "please put a text dummy" << std::endl; return -1;} 
+  std::string holdstd::string(argv[1]);
   for(int e = 2; e < argc; e++){ 
-    string temp_string(argv[e]);
-    holdstring += " " + temp_string;
+    std::string temp_std::string(argv[e]);
+    holdstd::string += " " + temp_std::string;
   } 
-  vector<string> v_script;
-  vector<string> v_portrait;
+  std::vector<std::string> v_script;
+  std::vector<std::string> v_portrait;
   std::ifstream f_script("script.txt");
   std::ifstream f_portrait("images/marjane.txt");
-  std::ostringstream buffer;
-  string s_buffer;
+  std::ostd::stringstream buffer;
+  std::string s_buffer;
   
   buffer << f_script.rdbuf();
   s_buffer = buffer.str();

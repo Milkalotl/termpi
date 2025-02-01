@@ -1,5 +1,7 @@
 #include "main.cpp"
 
+using namespace std;
+
 int main(){
   LINUX_SETUP('n');
   system("clear -x");
@@ -25,16 +27,19 @@ int main(){
   
   v_s_clean_func(&v_script);  
 
+//-------------------------------------------------
+
+  event_class start;
   event_class fox; 
-//  for(int e = 1; e < v_script.size(); e++)
-//    fox.add_textbox(v_script.at(e), v_profile);
-  for(int e = 1; e < v_script.size(); e++)
+  
+  start.add_textbox(
+      "Welcome to TEST! Here, Dreams come true!! blragrgggg....", {""}
+      );
+    for(int e = 1; e < v_script.size(); e++)
     fox.add_textbox(v_script.at(e), v_profile);
-/*
-  fox.play_textbox(1);
-  fox.play_textbox(2);
-  fox.play_textbox(3);
-*/
+  
+  start.play_all();
+
   fox.play_all();
   LINUX_SETUP('f');
   return 0;
