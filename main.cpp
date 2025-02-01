@@ -47,34 +47,16 @@ class textbox{
     int linenum;
     int boxnum;
 
-    textbox(std::string h_text, std::vector<std::string> h_portrait){ 
+    //default textboxes
+
+    textbox(std::string h_text, std::vector<std::string> h_portrait = {}, bool pp = false, bool pc = true, int prow = 0, int pcol = MAX_COL, char spc = ' ', bool h_pro = true){ 
       fulltext = s_split_func(h_text,' ');
       linenum = fulltext.size();
-      portrait = h_portrait;
-      has_portrait = true;
-      pref_pause = false;
-      pref_clear = true;
-      pref_row = 0;
-      pref_col = MAX_COL;
-      spaces = ' ';
-    }
-    
-    textbox(std::string h_text){ 
-      fulltext = s_split_func(h_text,' ');
-      linenum = fulltext.size();
-      has_portrait = false;
-      pref_pause = false;
-      pref_clear = true;
-      pref_row = 0;
-      pref_col = MAX_COL;
-      spaces = ' ';
-    }
-    
-    textbox(std::string h_text, std::vector<std::string> h_portrait, bool pp, bool pc, int prow, int pcol, char spc){ 
-      fulltext = s_split_func(h_text,' ');
-      linenum = fulltext.size();
-      portrait = h_portrait;
-      has_portrait = true;
+      
+      has_portrait = h_pro;
+      if (h_portrait.empty()) has_portrait = false;
+      if(has_portrait) portrait = h_portrait;
+      
       pref_pause = pp;
       pref_clear = pc;
       pref_row = prow;
@@ -162,15 +144,7 @@ class event_class{
   public:
     std::vector<textbox> textboxes;
       
-      event_class(void){
-        event_length = 0;
-        pref_pause = false;
-        pref_clear = true;
-        pref_row = 0;
-        pref_col = MAX_COL;
-      }
-      
-      event_class(bool pp, bool pc, int prow, int pcol){
+      event_class(bool pp=false, bool pc=true, int prow=0, int pcol=MAX_COL){
         event_length = 0;
         pref_pause = pp;
         pref_clear = pc;
@@ -191,6 +165,7 @@ class event_class{
       event_length += 1;
       return;
     }
+
     void play_textbox(int index){
       textboxes.at(index).play();
       return;
